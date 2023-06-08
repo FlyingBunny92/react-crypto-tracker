@@ -6,9 +6,11 @@ import { Link } from "react-router-dom";
 import { TrendingCoins } from "../../config/api";
 import { CryptoState } from "../../CryptoContext";
 import { numberWithCommas } from "../CoinsTable";
+import { StockData } from "../../config/api";
 
 const Carousel = () => {
   const [trending, setTrending] = useState([]);
+  const [stocks, setStocks] = useState([]);
   const { currency, symbol } = CryptoState();
 
   const fetchTrendingCoins = async () => {
@@ -16,7 +18,57 @@ const Carousel = () => {
 
     console.log(data);
     setTrending(data);
+    
+    const result = await fetchStockData();
   };
+
+  const fetchStockData = async () => {
+    let stockList = ['MSFT','AAPL','IBM','TSLA'];
+    let allData = [];
+    for(var j = 0; j < stockList.length; j++){
+      let stockName = stockList[j];
+      console.log("stockName:", stockName);
+      const API_KEY = 'HGJWFG4N8AQ66ICD';
+      const { data } = await axios.get(StockData(stockName, API_KEY));
+      let time_series_data = data['Time Series (Daily)'];
+      // console.log(time_series_data);
+      let keys = Object.keys(time_series_data);
+      // console.log(keys);
+
+      let values = time_series_data[keys[0]];
+      // console.log(values);
+      let keys2 = Object.keys(time_series_data[keys[0]]);
+      // console.log(keys2);
+      let high = values[keys2[1]];
+      // console.log(high);
+
+
+      let index2 = keys.length-5;
+      let values2 = time_series_data[keys[index2]];
+      // console.log(values2);
+      let keys3 = Object.keys(time_series_data[keys[index2]]);
+      // console.log(keys3);
+      let high2 = values2[keys3[1]];
+      // console.log(high2);
+
+
+      let diff = high - high2;
+      console.log("diff:", diff); 
+      let percent_diff = diff/high2;
+      let stockData = {
+        "name": stockName,
+        "high": high,
+        "change": diff,
+        "percent_change": percent_diff
+      }
+      // let stockData = [stockName, high2, diff, percent_diff];
+      allData.push(stockData);
+    }
+    console.log(allData);
+    setStocks(allData);
+  };
+
+
 
   useEffect(() => {
     fetchTrendingCoins();
@@ -41,19 +93,23 @@ const Carousel = () => {
 
   const classes = useStyles();
 
-  const items = trending.map((coin) => {
-    let profit = coin?.price_change_percentage_24h >= 0;
+  const items = stocks.map((coin) => {
+    let profit = coin?.change >= 0;
+    let img = new Image();
+    img.addEventListener("load", ()=>{
+      ctx.drawImage(img,0,0);
+      ctx.font = '50px serif';
+      ctx.fillText(coin.name, 50, 90);
+    });
+    coin.image = img;
 
     return (
       <Link className={classes.carouselItem} to={`/coins/${coin.id}`}>
-        <img
-          src={coin?.image}
-          alt={coin.name}
-          height="80"
-          style={{ marginBottom: 10 }}
-        />
+        <h1>
+          {coin?.name}
+        </h1>
         <span>
-          {coin?.symbol}
+          {coin?.name}
           &nbsp;
           <span
             style={{
@@ -62,11 +118,11 @@ const Carousel = () => {
             }}
           >
             {profit && "+"}
-            {coin?.price_change_percentage_24h?.toFixed(2)}%
+            {coin?.percent_change?.toFixed(2)}%
           </span>
         </span>
         <span style={{ fontSize: 22, fontWeight: 500 }}>
-          {symbol} {numberWithCommas(coin?.current_price.toFixed(2))}
+          {symbol} {numberWithCommas(coin?.change.toFixed(2))}
         </span>
       </Link>
     );
