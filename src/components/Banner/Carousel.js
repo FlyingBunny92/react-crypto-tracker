@@ -23,7 +23,7 @@ const Carousel = () => {
   };
 
   const fetchStockData = async () => {
-    let stockList = ['MSFT','AAPL','IBM','TSLA'];
+    let stockList = ['FSLR','ENPH','RUN','TSLA'];
     let allData = [];
     for(var j = 0; j < stockList.length; j++){
       let stockName = stockList[j];
