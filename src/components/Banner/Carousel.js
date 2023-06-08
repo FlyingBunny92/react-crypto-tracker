@@ -31,25 +31,18 @@ const Carousel = () => {
       const API_KEY = 'HGJWFG4N8AQ66ICD';
       const { data } = await axios.get(StockData(stockName, API_KEY));
       let time_series_data = data['Time Series (Daily)'];
-      // console.log(time_series_data);
       let keys = Object.keys(time_series_data);
-      // console.log(keys);
+
 
       let values = time_series_data[keys[0]];
-      // console.log(values);
       let keys2 = Object.keys(time_series_data[keys[0]]);
-      // console.log(keys2);
       let high = values[keys2[1]];
-      // console.log(high);
 
 
       let index2 = keys.length-5;
       let values2 = time_series_data[keys[index2]];
-      // console.log(values2);
       let keys3 = Object.keys(time_series_data[keys[index2]]);
-      // console.log(keys3);
       let high2 = values2[keys3[1]];
-      // console.log(high2);
 
 
       let diff = high - high2;
@@ -61,7 +54,6 @@ const Carousel = () => {
         "change": diff,
         "percent_change": percent_diff
       }
-      // let stockData = [stockName, high2, diff, percent_diff];
       allData.push(stockData);
     }
     console.log(allData);
