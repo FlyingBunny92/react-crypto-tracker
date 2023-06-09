@@ -20,6 +20,8 @@ import axios from "axios";
 import { CoinList } from "../config/api";
 import { useHistory } from "react-router-dom";
 import { CryptoState } from "../CryptoContext";
+import { MultipleStocks } from "../config/api";
+import { ListingStocks } from "../config/api";
 
 export function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -65,9 +67,35 @@ export default function CoinsTable() {
     setLoading(true);
     const { data } = await axios.get(CoinList(currency));
     console.log(data);
+    const result = await fetchMultipleStocks();
 
     setCoins(data);
     setLoading(false);
+  };
+
+  const fetchMultipleStocks = async () => {
+    const API_KEY = 'HGJWFG4N8AQ66ICD';
+    const { dataStr } = await axios.get(ListingStocks(API_KEY));
+    console.log("dataStr:", dataStr);
+    console.log("dataStr.length:", dataStr.length);
+    let data = dataStr.split(",");
+    console.log("data[7]:", data[7]);
+    let fullData = [];
+    for(var i = 7; i < data.length-7; i += 7){
+      let stockInfo = {
+        "symbol": data[i],
+        "name": data[i+1],
+        "exchange": data[i+2],
+        "assetType": data[i+3],
+        "ipoDate": data[i+4],
+        "delistingDate": data[i+5],
+        "status": data[i+6]
+      }
+      fullData.push(stockInfo);
+    }
+    console.log(fullData);
+    setStocks(fullData);
+
   };
 
   useEffect(() => {

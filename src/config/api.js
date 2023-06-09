@@ -13,3 +13,11 @@ export const TrendingCoins = (currency) =>
 
   export const StockData = (StockSymbol, API_KEY) =>
   `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${StockSymbol}&outputsize=full&apikey=${API_KEY}`;
+
+
+  export const MultipleStocks = (StockListString, API_KEY) =>
+  `https://www.alphavantage.co/query?function=BATCH_STOCK_QUOTES&apikey=xxx&symbols=${StockListString}&outputsize=full&apikey=${API_KEY}`;
+
+
+  export const ListingStocks = (API_KEY) =>
+  `https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=${API_KEY}`;
