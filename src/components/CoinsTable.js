@@ -23,6 +23,9 @@ import { CryptoState } from "../CryptoContext";
 import { MultipleStocks } from "../config/api";
 import { ListingStocks } from "../config/api";
 
+const API_KEY = '3YROQALYDS8I7790';
+const API_BASE_URL = 'https://www.alphavantage.co/query';
+
 export function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -32,6 +35,7 @@ export default function CoinsTable() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [stocks, setStocks] = useState([]);
 
   const { currency, symbol } = CryptoState();
 
@@ -63,51 +67,45 @@ export default function CoinsTable() {
     },
   });
 
-  const fetchCoins = async () => {
-    setLoading(true);
-    const { data } = await axios.get(CoinList(currency));
-    console.log(data);
-    const result = await fetchMultipleStocks();
 
-    setCoins(data);
-    setLoading(false);
-  };
+  const fetchStockData = async () => {
+    console.log("const fetchMultipleStocks = async (searchKeyWord) => {");
+    const searchStock = () => {
+      axios.get(`https://raw.githubusercontent.com/FlyingBunny92/react-crypto-tracker/liam_favorite_stocks/public/symbols.json`,{
+      })
+      .then(json => {
+        console.log("json.data:");
+        console.log(json.data);
+        console.log(JSON.parse(JSON.stringify(json.data)));
+        var data = JSON.parse(JSON.stringify(json.data));
+        let stockData = [
+        ];
+        Object.keys(data).forEach(function(key) {
+          console.log('Key : ' + key + ', Value : ' + data[key]);
+          let stockJSON = {name: key, price: data[key], symbol: key};
+          stockData.push(stockJSON);
+        })
+        console.log("stockData:");
+        console.log(stockData);
 
-  const fetchMultipleStocks = async () => {
-    const API_KEY = 'HGJWFG4N8AQ66ICD';
-    const { dataStr } = await axios.get(ListingStocks(API_KEY));
-    console.log("dataStr:", dataStr);
-    console.log("dataStr.length:", dataStr.length);
-    let data = dataStr.split(",");
-    console.log("data[7]:", data[7]);
-    let fullData = [];
-    for(var i = 7; i < data.length-7; i += 7){
-      let stockInfo = {
-        "symbol": data[i],
-        "name": data[i+1],
-        "exchange": data[i+2],
-        "assetType": data[i+3],
-        "ipoDate": data[i+4],
-        "delistingDate": data[i+5],
-        "status": data[i+6]
-      }
-      fullData.push(stockInfo);
+        setStocks(stockData);
+      })
     }
-    console.log(fullData);
-    setStocks(fullData);
-
+    searchStock();
   };
+
+
 
   useEffect(() => {
-    fetchCoins();
+    fetchStockData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);
 
   const handleSearch = () => {
-    return coins.filter(
-      (coin) =>
-        coin.name.toLowerCase().includes(search) ||
-        coin.symbol.toLowerCase().includes(search)
+    return stocks.filter(
+      (stock) =>
+        stock.name.toLowerCase().includes(search) ||
+        stock.symbol.toLowerCase().includes(search)
     );
   };
 
@@ -153,7 +151,7 @@ export default function CoinsTable() {
                 {handleSearch()
                   .slice((page - 1) * 10, (page - 1) * 10 + 10)
                   .map((row) => {
-                    const profit = row.price_change_percentage_24h > 0;
+                    const profit = row.price > 0;
                     return (
                       <TableRow
                         onClick={() => history.push(`/coins/${row.id}`)}
@@ -168,12 +166,7 @@ export default function CoinsTable() {
                             gap: 15,
                           }}
                         >
-                          <img
-                            src={row?.image}
-                            alt={row.name}
-                            height="50"
-                            style={{ marginBottom: 10 }}
-                          />
+
                           <div
                             style={{ display: "flex", flexDirection: "column" }}
                           >
@@ -192,7 +185,7 @@ export default function CoinsTable() {
                         </TableCell>
                         <TableCell align="right">
                           {symbol}{" "}
-                          {numberWithCommas(row.current_price.toFixed(2))}
+                          {numberWithCommas(row.price)}
                         </TableCell>
                         <TableCell
                           align="right"
@@ -202,12 +195,12 @@ export default function CoinsTable() {
                           }}
                         >
                           {profit && "+"}
-                          {row.price_change_percentage_24h.toFixed(2)}%
+                          {row.price}%
                         </TableCell>
                         <TableCell align="right">
                           {symbol}{" "}
                           {numberWithCommas(
-                            row.market_cap.toString().slice(0, -6)
+                            row.price
                           )}
                           M
                         </TableCell>
