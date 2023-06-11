@@ -11,13 +11,13 @@ export const TrendingCoins = (currency) =>
   `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=gecko_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h`;
 
 
-  export const StockData = (StockSymbol, API_KEY) =>
+export const StockData = (StockSymbol, API_KEY) =>
   `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${StockSymbol}&outputsize=full&apikey=${API_KEY}`;
 
 
-  export const MultipleStocks = (StockListString, API_KEY) =>
+export const MultipleStocks = (StockListString, API_KEY) =>
   `https://www.alphavantage.co/query?function=BATCH_STOCK_QUOTES&apikey=xxx&symbols=${StockListString}&outputsize=full&apikey=${API_KEY}`;
 
 
-  export const ListingStocks = (API_KEY) =>
+export const ListingStocks = (API_KEY) =>
   `https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=${API_KEY}`;
