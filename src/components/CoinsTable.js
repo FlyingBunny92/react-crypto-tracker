@@ -80,10 +80,12 @@ export default function CoinsTable() {
         var data = JSON.parse(JSON.stringify(json.data));
         let stockData = [
         ];
+        let rowId = 1;
         Object.keys(data).forEach(function(key) {
           console.log('Key : ' + key + ', Value : ' + data[key]);
-          let stockJSON = {name: key, price: data[key], symbol: key};
+          let stockJSON = {name: key, price: data[key], symbol: key, id: rowId};
           stockData.push(stockJSON);
+          rowId += 1;
         })
         console.log("stockData:");
         console.log(stockData);

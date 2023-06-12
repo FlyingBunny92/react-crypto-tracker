@@ -20,8 +20,25 @@ const StockPage = () => {
   const { currency, symbol } = CryptoState();
 
   const fetchStock = async () => {
+    console.log("id:", id);
     const { data } = await axios.get(StockData(id, API_KEY));
-
+    console.log("data:");
+    console.log(data);
+    var dataSet = data['Time Series (Daily)'];
+    console.log("dataSet:", dataSet);
+    console.log("dataSet.length:", dataSet.length);
+    for (var key in dataSet){
+      var value = dataSet[key];
+      var d = value.high;
+      console.log("d:", d);
+      newData.push(d);
+    }
+    var newData = [];
+    for(var j = 0; j < dataSet.length; j++){
+      var d = dataSet[j].high;
+      console.log("d:", d);
+      newData.push(d);
+    }
     setStock(data);
   };
 
